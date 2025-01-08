@@ -1,0 +1,13 @@
+{
+    "statusCode": 200,
+    "data": {
+        "user": {
+            "_id": "677e8fa5c50a2d6ef3fb7964",
+            "email": "owaisiqbal2021@gmail.com",
+            "fullName": "Muhammad Owais",
+            "__v": 0
+        }
+    },
+    "message": "User Registered Successfully",
+    "success": true
+}
