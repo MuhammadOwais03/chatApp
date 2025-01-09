@@ -25,7 +25,7 @@ const UserSchema = new Schema ({
         type: 'String',
         default: ""
     }
-})
+}, {timestamps: true})
 
 
 UserSchema.pre('save', async function (next) {

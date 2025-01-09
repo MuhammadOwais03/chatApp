@@ -7,6 +7,8 @@ import bcrypt from 'bcryptjs'; // for password hashing
 import { uploadOnCloudinary } from '../utils/cloundinary.js';
 
 export const userRegistration = asyncHandler(async (req, res) => {
+
+    console.log(req.body)
     
     const { email, fullName, password } = req.body;
 
@@ -139,7 +141,7 @@ export const login = asyncHandler(async(req, res)=>{
         .json(
             new ApiResponse(
                 200,
-                { user: userExist},
+                 userExist,
                 "User Logged In Successfully"
             )
         );
@@ -165,23 +167,27 @@ export const logout = asyncHandler( async (req, res)=>{
 
 export const updateProfile = asyncHandler(async (req, res) => {
 
-    console.log(req.file)
+    console.log(req.file);
 
     const { email, password } = req.body;
     const { file } = req; 
-    const profilePic = file
+    const profilePic = file;
 
-    
     const userId = req.user._id; 
+
+    // Check if the user exists before proceeding
     const user = await userSchema.findById(userId);
 
     if (!user) {
         throw new ApiError(404, "User not found");
     }
 
-    
-    if (email) {
-        
+    // Prepare the update object
+    let updateData = {};
+
+    // Check if email exists and is valid before updating
+    if (email && email !== "null") {  // Ensure email is not "null" or undefined
+        console.log("EMAIL", email, typeof(email));
         const emailExists = await userSchema.findOne({ email });
 
         if (emailExists) {
@@ -190,36 +196,38 @@ export const updateProfile = asyncHandler(async (req, res) => {
             );
         }
 
-        user.email = email;  
+        updateData.email = email;  // Add email to update object
     }
 
-    
+    // Check if password is being changed
     if (password) {
         const hashedPassword = await bcrypt.hash(password, 10);
-        user.password = hashedPassword;  
+        updateData.password = hashedPassword;  // Add password to update object
     }
 
-    
+    // If there is a profile picture, handle upload
     if (profilePic) {
         try {
-            
-            const result = await uploadOnCloudinary(profilePic.path)
-
-            
-            user.profilePic = result.secure_url;
+            const result = await uploadOnCloudinary(profilePic.path);
+            updateData.profilePic = result.secure_url;  // Add profilePic to update object
         } catch (error) {
-            console.log(error)
+            console.log(error);
             return res.status(500).json(
                 new ApiResponse(500, null, "Error uploading profile picture to Cloudinary")
             );
         }
     }
 
-    
+    // Use findByIdAndUpdate to update user document
     try {
-        await user.save();
+        const updatedUser = await userSchema.findByIdAndUpdate(
+            userId, 
+            updateData,  // Pass the updateData object
+            { new: true } // To return the updated document
+        );
+
         return res.status(200).json(
-            new ApiResponse(200, { user }, "Profile updated successfully")
+            new ApiResponse(200, updatedUser , "Profile updated successfully")
         );
     } catch (error) {
         console.log(error);
@@ -230,11 +238,18 @@ export const updateProfile = asyncHandler(async (req, res) => {
 });
 
 
+
 export const check = asyncHandler( async (req, res)=>{
+
+    const id = req.user._id
+
+    const user = await userSchema.findOne(id).select("-password")
+
+
     res.status(201).json(
         new ApiResponse(
             201,
-            null,
+            user,
             "user is authenticated"
         )
     )

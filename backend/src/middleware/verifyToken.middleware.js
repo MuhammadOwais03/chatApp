@@ -4,10 +4,12 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import { userSchema } from '../models/user.models.js';
 
 const verifyToken = asyncHandler(async (req, res, next) => {
+
+    console.log(req)
     // Access the token from cookies
     const token = req.cookies.accessToken;  // Use req.cookies to access cookies
 
-    if (!token) return res.status(403).json(new ApiResponse(403, null, 'Access denied'));
+    if (!token) return res.status(200).json(new ApiResponse(403, null, 'Access denied'));
 
     try {
         // Verify token

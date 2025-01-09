@@ -16,10 +16,10 @@ const messagesRouter = Router()
 
 
 messagesRouter.get('/users', verifyToken, getAllUsers)
-messagesRouter.get('/message:id', verifyToken, messageWithUser)
+messagesRouter.get('/message/:id', verifyToken, messageWithUser)
 messagesRouter.post('/post-message', verifyToken, upload.array('images') , postMessages)
-messagesRouter.delete('/delete-message:id', verifyToken, deleteMessage)
-messagesRouter.put('/delete-message:id', verifyToken, updateMessage)
+messagesRouter.delete('/delete-message/:id', verifyToken, deleteMessage)
+messagesRouter.put('/delete-message/:id', verifyToken, updateMessage)
 
 
 export {messagesRouter}

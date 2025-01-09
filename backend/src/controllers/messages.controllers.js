@@ -16,7 +16,7 @@ export const getAllUsers = asyncHandler( async (req, res)=>{
     try {
         const loggedInUser = req.user._id;
         const filteredUser = await userSchema.find({ _id: { $ne: loggedInUser } });
-        const response = new ApiResponse(200, { allUsers: filteredUser }, "Successfully fetched");
+        const response = new ApiResponse(200, filteredUser , "Successfully fetched");
 
         return res.status(200).json(response);
 
@@ -54,7 +54,7 @@ export const messageWithUser = asyncHandler( async (req, res)=> {
                     }
     )
 
-    const response = new ApiResponse(200, { messages: messages }, "Successfully fetched");
+    const response = new ApiResponse(200, messages , "Successfully fetched");
 
     return res.status(200).json(response);
 

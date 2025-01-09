@@ -12,6 +12,6 @@ userRouter.post('/login', login)
 userRouter.post('/logout', logout)
 
 userRouter.post('/update-profile', verifyToken, upload.single('profilePic'), updateProfile)
-userRouter.post('/check', verifyToken, check)
+userRouter.get('/check', verifyToken, check)
 
 export {userRouter}
