@@ -5,12 +5,15 @@ import cookieParser from "cookie-parser";
 import { userRouter } from "./routes/user.route.js";
 import { messagesRouter } from "./routes/messages.route.js";
 
+import path from "path";
+
 
 import express from "express";
 import { Server } from "socket.io";
 import http from "http";
 
 const app = express();
+const __dirname = path.resolve();
 
 const server = http.createServer(app);
 
@@ -97,5 +100,14 @@ app.post("/", (req, res) => {
     seedDatabase()
     res.json("hello");
 });
+
+
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+  
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+    });
+  }
 
 export { app, server, io };
