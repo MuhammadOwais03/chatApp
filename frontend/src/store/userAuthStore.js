@@ -5,8 +5,8 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const baseUrl = import.meta.env.MODE === "development" ? "http://localhost:5000/api" : "/api";
-const backendUrl = import.meta.env.MODE === "development" ? "http://localhost:5000" : "/"
+const baseUrl = import.meta.env.MODE === "development" ? "http://localhost:5000/api" : "https://chat-app-backend-mu-liard.vercel.app/api";
+const backendUrl = import.meta.env.MODE === "development" ? "http://localhost:5000" : "https://chat-app-backend-mu-liard.vercel.app/"
 
 console.log(backendUrl)
 

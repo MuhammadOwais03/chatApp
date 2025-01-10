@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "./userAuthStore";
 import { ReceiptEuro } from "lucide-react";
 
-const baseUrl = import.meta.env.MODE === "development" ? "http://localhost:5000/api" : "/api";
+const baseUrl = import.meta.env.MODE === "development" ? "http://localhost:5000/api" : "https://chat-app-backend-mu-liard.vercel.app/api";
 
 export const useChatStore = create((set, get) => ({
   messages: [],
