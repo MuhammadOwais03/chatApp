@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
 const baseUrl = "https://chat-app-backend-mu-liard.vercel.app/api";
-const backendUrl = "wss://chat-app-backend-mu-liard.vercel.app"
+const backendUrl = "https://chat-app-backend-mu-liard.vercel.app"
 
 
 // const baseUrl = import.meta.env.MODE === "development" ? "http://localhost:5000/api" : "https://chat-app-backend-mu-liard.vercel.app/api";
@@ -110,7 +110,6 @@ export const useAuthStore = create((set, get) => ({
 
         const socket = io(backendUrl, {
             query: { userId: authUser._id },
-            transports: ["websocket"],
             withCredentials: true, 
         });
 
