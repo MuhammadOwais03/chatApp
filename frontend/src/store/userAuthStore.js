@@ -6,7 +6,9 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
 const baseUrl = import.meta.env.MODE === "development" ? "http://localhost:5000/api" : "/api";
-const backendUrl = import.meta.env.MODE === "development" ? "http://localhost:5000/api" : "/"
+const backendUrl = import.meta.env.MODE === "development" ? "http://localhost:5000" : "/"
+
+console.log(backendUrl)
 
 
 export const useAuthStore = create((set, get) => ({
@@ -107,7 +109,9 @@ export const useAuthStore = create((set, get) => ({
 
         set({ socket: socket });
 
+        console.log("connecting the socket")
         socket.connect();
+        console.log("connecting the socket done")
 
         socket.on("getOnlineUsers", (userIds) => {
             set({ onlineUsers: userIds });
