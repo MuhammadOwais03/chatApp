@@ -111,6 +111,7 @@ export const useAuthStore = create((set, get) => ({
         const socket = io(backendUrl, {
             query: { userId: authUser._id },
             transports: ["polling", "websocket"],
+            withCredentials: true, 
         });
 
         set({ socket: socket });
