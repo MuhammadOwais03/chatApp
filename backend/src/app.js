@@ -22,7 +22,7 @@ console.log(process.env.CORS_ORIGIN, "KK")
 
 const io = new Server(server, {
     cors: {
-        origin: process.env.CORS_ORIGIN,
+        origin: "https://chat-app-chatty.vercel.app",
     },
 });
 
@@ -79,7 +79,7 @@ console.log(process.env.CORS_ORIGIN)
 
 app.use(cookieParser());
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: "https://chat-app-chatty.vercel.app",
     credentials: true,
 }));
 
