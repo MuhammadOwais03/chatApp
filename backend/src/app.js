@@ -15,7 +15,7 @@ const __dirname = path.resolve();
 const server = http.createServer(app);
 
 // CORS configuration - Adjust it for development and production environments
-const allowedOrigins = ["https://chat-app-chatty.vercel.app", "http://localhost:5173"];
+const allowedOrigins = ["https://chat-app-chatty.vercel.app", "http://localhost:5173", "wss://chat-app-chatty.vercel.app"];
 const corsOptions = {
     origin: (origin, callback) => {
         if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
