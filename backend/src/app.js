@@ -1,37 +1,101 @@
-import express from "express"
-import cors from "cors"
-import cookieParser from 'cookie-parser';
+// import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+// import { app } from "./utils/socket.js";
+import { userRouter } from "./routes/user.route.js";
+import { messagesRouter } from "./routes/messages.route.js";
+
+
+import express from "express";
+import { Server } from "socket.io";
+import http from "http";
+
+const app = express();
+
+const server = http.createServer(app);
+
+
+console.log(process.env.CORS_ORIGIN, "KK")
+
+const io = new Server(server, {
+    cors: {
+        origin: process.env.CORS_ORIGIN,
+    },
+});
+
+
+const newSocketUser = {}
+
+
+export const getUserSocketId = (userId) => {
+    return newSocketUser[userId]
+}
+
+io.on("connection", (socket) => {
+    console.log("A user connected: ", socket.id);
+
+    const userId = socket.handshake.query.userId;
+
+    if (userId) {
+        newSocketUser[userId] = socket.id;  // Store socket by userId
+    } else {
+        console.log('No userId provided in connection query');
+    }
+
+    console.log(newSocketUser);
+
+    // Emit the online users
+    io.emit("getOnlineUsers", Object.keys(newSocketUser));
+
+    socket.on("disconnect", (reason) => {
+        console.log(`A user disconnected: ${socket.id}, Reason: ${reason}`);
+
+        
+        const user = Object.keys(newSocketUser).find(userId => newSocketUser[userId] === socket.id);
+
+        console.log("Delete:", user)
+
+        if (user) {
+            delete newSocketUser[user];  
+            console.log(`Removed userId: ${user} from online users`);
+        }
+
+        console.log(newSocketUser)
+
+        // Emit the updated online users
+        io.emit("getOnlineUsers", Object.keys(newSocketUser));
+    });
+});
 
 
 
-const app = express()
+
+
+
+console.log(process.env.CORS_ORIGIN)
 
 app.use(cookieParser());
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
-    credentials: true
-}))
+    credentials: true,
+}));
 
-console.log(process.env.CORS_ORIGIN)
+console.log(process.env.CORS_ORIGIN);
 
-app.use(express.json({limit: "16kb"}))
-app.use(express.urlencoded({
-    extended: true,
-    limit: "16kb"
-}))
-app.use(express.static("public"))
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.static("public"));
 
 
-//Routes
+import seedDatabase from "./seeds/seeds.users.js";
 
-import { userRouter } from "./routes/user.route.js"
-import { messagesRouter } from "./routes/messages.route.js";
+// Routes
+app.use("/api/users", userRouter);
+app.use("/api/messages", messagesRouter);
 
-app.post('/', (req, res)=>{
-    res.json('hello')
-})
+app.post("/", (req, res) => {
+    seedDatabase()
+    res.json("hello");
+});
 
-app.use('/api/users', userRouter)
-app.use('/api/messages', messagesRouter)
-
-export { app }
+export { app, server, io };

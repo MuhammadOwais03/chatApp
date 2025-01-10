@@ -8,6 +8,8 @@ import { generateToken, generateAccessTokenFromRefreshToken } from '../utils/tok
 import bcrypt from 'bcryptjs'; 
 import { v2 as cloudinary } from 'cloudinary';
 import { uploadOnCloudinary } from '../utils/cloundinary.js';
+import { getUserSocketId, io } from '../app.js';
+import { isObjectIdOrHexString } from 'mongoose';
 
 
 export const getAllUsers = asyncHandler( async (req, res)=>{
@@ -67,7 +69,10 @@ export const postMessages = asyncHandler(async (req, res) => {
     const loggedInUser = req.user._id;
     const { senderId, chatWithId, text } = req.body;
 
-    if (!senderId || !chatWithId || !text) {
+
+    console.log(req.body, req.files)
+
+    if (!senderId || !chatWithId ) {
         return res.status(400).json(
             new ApiResponse(
                 400,
@@ -77,13 +82,18 @@ export const postMessages = asyncHandler(async (req, res) => {
         );
     }
 
+    console.log(req.files)
+
     let imagesurl = [];
     if (req.files && req.files.length > 0) {
         imagesurl = req.files.map((image) => image.path);
 
         try {
             imagesurl = await Promise.all(
-                imagesurl.map((path) => uploadOnCloudinary(path))
+                imagesurl.map(async (filePath) => {
+                    const result = await uploadOnCloudinary(filePath);
+                    return result.secure_url;
+                })
             );
         } catch (error) {
             console.error("Error uploading images to Cloudinary:", error);
@@ -97,12 +107,14 @@ export const postMessages = asyncHandler(async (req, res) => {
         }
     }
 
+    console.log(imagesurl)
+
     try {
         const message = await Messages.create({
             senderId: senderId,
             receiverId: chatWithId,
             text: text,
-            images: imagesurl
+            image: imagesurl
         });
 
         const messageChecked = await Messages.findById(message._id);
@@ -117,10 +129,20 @@ export const postMessages = asyncHandler(async (req, res) => {
             );
         }
 
+
+        const chatUserSocketId = getUserSocketId(chatWithId)
+
+        console.log("chat", chatUserSocketId)
+
+        if(chatUserSocketId) {
+            console.log("new")
+            io.to(chatUserSocketId).emit("newMessage",messageChecked)
+        }
+
         return res.status(201).json(
             new ApiResponse(
                 201,
-                { message: messageChecked },
+                messageChecked,
                 "Successfully sent the message"
             )
         );

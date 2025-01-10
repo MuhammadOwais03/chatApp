@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
         cb(null, tempDir);
     },
     filename: function (req, file, cb) {
-        console.log("Entered Multer", file)
+        // console.log("Entered Multer", file)
         cb(null, file.originalname);
     }
 });

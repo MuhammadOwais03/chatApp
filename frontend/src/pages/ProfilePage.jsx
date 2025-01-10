@@ -15,6 +15,7 @@ const ProfilePage = () => {
   const handleUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
+      console.log(file)
       setProfileImg(file);
     }
   };

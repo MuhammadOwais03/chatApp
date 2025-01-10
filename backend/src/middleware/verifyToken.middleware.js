@@ -5,7 +5,7 @@ import { userSchema } from '../models/user.models.js';
 
 const verifyToken = asyncHandler(async (req, res, next) => {
 
-    console.log(req)
+    // console.log(req)
     // Access the token from cookies
     const token = req.cookies.accessToken;  // Use req.cookies to access cookies
 

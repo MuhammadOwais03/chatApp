@@ -19,7 +19,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 const App = () => {
-    const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
+    const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
     const {theme} = useThemeStore()
 
     const enableSmoothScroll = () => {
@@ -35,6 +35,9 @@ const App = () => {
     useEffect(() => {
         checkAuth();
     }, [checkAuth]);
+
+
+    console.log(onlineUsers)
 
     if (isCheckingAuth && !authUser) {
         return (
