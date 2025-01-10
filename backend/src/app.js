@@ -32,7 +32,7 @@ app.use(cors(corsOptions));
 
 // Initialize Socket.io with CORS configuration
 const io = new Server(server, {
-    transports: ['websocket'],
+    // transports: ['websocket'],
     cors: {
         origin: allowedOrigins,
         methods: ["GET", "POST"],
