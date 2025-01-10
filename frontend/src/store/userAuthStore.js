@@ -10,7 +10,7 @@ const backendUrl = "wss://chat-app-backend-mu-liard.vercel.app"
 
 
 // const baseUrl = import.meta.env.MODE === "development" ? "http://localhost:5000/api" : "https://chat-app-backend-mu-liard.vercel.app/api";
-// const backendUrl = import.meta.env.MODE === "development" ? "http://localhost:5000" : "https://chat-app-backend-mu-liard.vercel.app/"
+// const backendUrl = import.meta.env.MODE === "development" ? "ws://localhost:5000" : "wss://chat-app-backend-mu-liard.vercel.app/"
 
 
 console.log(backendUrl)
