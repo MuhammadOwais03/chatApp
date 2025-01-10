@@ -26,7 +26,7 @@ export const useAuthStore = create((set, get) => ({
     socket: null,
 
     checkAuth: async () => {
-        console.log(axiosInstance.defaults.baseURL);
+        // console.log(axiosInstance.defaults.baseURL);
 
         try {
             const res = await axios.get(`${baseUrl}/users/check`, { withCredentials: true });

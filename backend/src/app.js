@@ -22,7 +22,7 @@ console.log(process.env.CORS_ORIGIN, "KK")
 
 const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: "https://chat-app-backend-mu-liard.vercel.app",
     },
 });
 
