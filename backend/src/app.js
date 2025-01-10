@@ -1,39 +1,52 @@
-// import express from "express";
+import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-// import { app } from "./utils/socket.js";
-import { userRouter } from "./routes/user.route.js";
-import { messagesRouter } from "./routes/messages.route.js";
-
 import path from "path";
-
-
-import express from "express";
 import { Server } from "socket.io";
 import http from "http";
 
+import { userRouter } from "./routes/user.route.js";
+import { messagesRouter } from "./routes/messages.route.js";
+import seedDatabase from "./seeds/seeds.users.js";
+
+// Initialize Express app
 const app = express();
 const __dirname = path.resolve();
-
 const server = http.createServer(app);
 
+// CORS configuration - Adjust it for development and production environments
+const allowedOrigins = ["https://chat-app-chatty.vercel.app"];
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true, // Allow credentials (cookies or JWT)
+};
 
-console.log(process.env.CORS_ORIGIN, "KK")
+// Apply CORS middleware
+app.use(cors(corsOptions));
 
+// Initialize Socket.io with CORS configuration
 const io = new Server(server, {
     cors: {
-        origin: "https://chat-app-chatty.vercel.app",
+        origin: allowedOrigins,
+        methods: ["GET", "POST"],
+        credentials: true,
     },
 });
 
-
-const newSocketUser = {}
-
+// Store connected users by their socket ID
+const newSocketUser = {};
 
 export const getUserSocketId = (userId) => {
-    return newSocketUser[userId]
-}
+    return newSocketUser[userId];
+};
 
+// Handle WebSocket connections
 io.on("connection", (socket) => {
     console.log("A user connected: ", socket.id);
 
@@ -41,11 +54,7 @@ io.on("connection", (socket) => {
 
     if (userId) {
         newSocketUser[userId] = socket.id;  // Store socket by userId
-    } else {
-        console.log('No userId provided in connection query');
     }
-
-    console.log(newSocketUser);
 
     // Emit the online users
     io.emit("getOnlineUsers", Object.keys(newSocketUser));
@@ -53,61 +62,37 @@ io.on("connection", (socket) => {
     socket.on("disconnect", (reason) => {
         console.log(`A user disconnected: ${socket.id}, Reason: ${reason}`);
 
-        
         const user = Object.keys(newSocketUser).find(userId => newSocketUser[userId] === socket.id);
 
-        console.log("Delete:", user)
-
         if (user) {
-            delete newSocketUser[user];  
-            console.log(`Removed userId: ${user} from online users`);
+            delete newSocketUser[user];  // Remove from online users
         }
-
-        console.log(newSocketUser)
 
         // Emit the updated online users
         io.emit("getOnlineUsers", Object.keys(newSocketUser));
     });
 });
 
-
-
-
-
-
-console.log(process.env.CORS_ORIGIN)
-
+// Middleware for parsing cookies and JSON requests
 app.use(cookieParser());
-app.use(cors({
-    origin: "https://chat-app-chatty.vercel.app",
-    credentials: true,
-}));
-
-console.log(process.env.CORS_ORIGIN);
-
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-app.use(express.static("public"));
 
-
-import seedDatabase from "./seeds/seeds.users.js";
 
 // Routes
 app.use("/api/users", userRouter);
 app.use("/api/messages", messagesRouter);
 
+// Test route to seed the database
 app.post("/", (req, res) => {
-    seedDatabase()
+    seedDatabase();
     res.json("hello");
 });
 
-
-if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "../frontend/dist")));
-  
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-    });
-  }
-
+// Export the app, server, and socket instance
 export { app, server, io };
+
+// Start the server
+server.listen(5000, () => {
+    console.log("Server running on port 5000");
+});
